@@ -2,120 +2,120 @@
 #
 # Update packages
 ###############################################################################
-- name: Atualizando todos pacotes para sistemas Ubuntu/Debian
-  apt:
-    upgrade: full
-    update_cache: yes
-  when: ansible_os_family == "Debian"
+  - name: Atualizando todos pacotes para sistemas Ubuntu/Debian
+    apt:
+      upgrade: full
+      update_cache: yes
+    when: ansible_os_family == "Debian"
 
-- name: Instalando os pacotes defaults para sistemas CentOS/RedHat
-  yum:
-    name: "{{ centos }}"
-    state: latest
-    update_cache: yes
-  when: ansible_os_family == "RedHat"
+  - name: Instalando os pacotes defaults para sistemas CentOS/RedHat
+    yum:
+      name: "{{ centos }}"
+      state: latest
+      update_cache: yes
+    when: ansible_os_family == "RedHat"
 
-- name: Atualizando todos os pacotes para sistemas CentOS/RedHat
-  yum:
-    name: "*"
-    state: latest
-    update_cache: yes
-  when: ansible_os_family == "RedHat"
+  - name: Atualizando todos os pacotes para sistemas CentOS/RedHat
+    yum:
+      name: "*"
+      state: latest
+      update_cache: yes
+    when: ansible_os_family == "RedHat"
 
-- name: Instalando os pacotes default's do playbook
-  package:
-    name: "{{ multidist }}"
-    state: latest
+  - name: Instalando os pacotes default's do playbook
+    package:
+      name: "{{ multidist }}"
+      state: latest
 
-#
-# Timezone e Clock
-################################################################################
-- name: Mudando a timezone
-  timezone:
-    name: "{{ timezone }}"
+  #
+  # Timezone e Clock
+  ################################################################################
+  - name: Mudando a timezone
+    timezone:
+      name: "{{ timezone }}"
 
-- name: Configurando o cliente NTP
-  copy:
-    src: ntp.conf
-    dest: /etc/ntp.conf
-    owner: root
-    group: root
-    mode: 0640
+  - name: Configurando o cliente NTP
+    copy:
+      src: ntp.conf
+      dest: /etc/ntp.conf
+      owner: root
+      group: root
+      mode: 0640
 
-- name: Criando o arquivo drift para o serviço NTP
-  file:
-    path: /etc/drift
-    state: touch
-    owner: ntp
-    group: ntp
-    mode: 0640
+  - name: Criando o arquivo drift para o serviço NTP
+    file:
+      path: /etc/drift
+      state: touch
+      owner: ntp
+      group: ntp
+      mode: 0640
 
-#
-# Hostname e Network
-################################################################################
-- name: Mudando o hostname
-  hostname:
-    name: '{{ hostname }}.{{ domain }}'
+  #
+  # Hostname e Network
+  ################################################################################
+  - name: Mudando o hostname
+    hostname:
+      name: '{{ hostname }}.{{ domain }}'
 
-- name: Incluindo o hostname no /etc/hosts
-  lineinfile:
-    path: /etc/hosts
-    line: '127.0.0.1 {{ hostname }}.{{ domain }} {{ hostname }}'
-    state: present
+  - name: Incluindo o hostname no /etc/hosts
+    lineinfile:
+      path: /etc/hosts
+      line: '127.0.0.1 {{ hostname }}.{{ domain }} {{ hostname }}'
+      state: present
 
-#
-# Habilitar serviços
-################################################################################
-- name: Habilitando todos os serviços - utilizando o Systemd
-  systemd:
-    daemon_reload: yes
-    state: started
-    enabled: yes
-    name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpd' }}"
-  ignore_errors: yes
+  #
+  # Habilitar serviços
+  ################################################################################
+  - name: Habilitando todos os serviços - utilizando o Systemd
+    systemd:
+      daemon_reload: yes
+      state: started
+      enabled: yes
+      name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpd' }}"
+    ignore_errors: yes
 
-- name: Habilitando todos os serviços - utilizando Upstart/System V
-  service:
-    name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpd' }}"
-    state: started
-    enabled: yes
-  ignore_errors: yes
+  - name: Habilitando todos os serviços - utilizando Upstart/System V
+    service:
+      name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpd' }}"
+      state: started
+      enabled: yes
+    ignore_errors: yes
 
-#
-# Criando .hushlogin em todos as user's home
-################################################################################
-- name: Criando .hushlogin dento de /etc/skel
-  file:
-    path: /etc/skel/.hushlogin
-    state: touch
-    owner: root
-    group: root
-    mode: 0600
-  when: enable_hushlogin is defined
+  #
+  # Criando .hushlogin em todos as user's home
+  ################################################################################
+  - name: Criando .hushlogin dento de /etc/skel
+    file:
+      path: /etc/skel/.hushlogin
+      state: touch
+      owner: root
+      group: root
+      mode: 0600
+    when: enable_hushlogin is defined
 
-- name: Criando .hushlogin dentro das users home
-  file:
-    path: ~/.hushlogin
-    state: touch
-    owner: root
-    group: root
-    mode: 0600
-  when: enable_hushlogin is defined
+  - name: Criando .hushlogin dentro das users home
+    file:
+      path: ~/.hushlogin
+      state: touch
+      owner: root
+      group: root
+      mode: 0600
+    when: enable_hushlogin is defined
 
-#
-# Editando SSH para maior segurança
-################################################################################
-- name: Mudando a porta padrão do SSH
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^#Port 22'
-    line: 'Port {{ ssh_port }}'
-    state: present
-  when: ssh_port is defined
+  #
+  # Editando SSH para maior segurança
+  ################################################################################
+  - name: Mudando a porta padrão do SSH
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^#Port 22'
+      line: 'Port {{ ssh_port }}'
+      state: present
+    when: ssh_port is defined
 
-- name: Desabilitando login como root no SSH
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: 'PermitRootLogin yes'
-    line: 'PermitRootLogin no'
-    state: present
+  - name: Desabilitando login como root no SSH
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: 'PermitRootLogin yes'
+      line: 'PermitRootLogin no'
+      state: present
