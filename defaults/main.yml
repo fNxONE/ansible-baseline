@@ -5,7 +5,7 @@ multidist:
   - wget
   - unzip
   - ntp
-  - systat
+  - sysstat
   - sudo
   - ca-certificates
   - net-tools
