@@ -1,0 +1,16 @@
+---
+# defaults packages installed with baseline
+multidist:
+  - vim
+  - wget
+  - unzip
+  - ntp
+  - systat
+  - sudo
+  - ca-certificates
+
+centos:
+  - deltarpm
+  - libselinux-python
+  - policycoreutils-python
+  - epel-release

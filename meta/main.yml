@@ -1,0 +1,30 @@
+galaxy_info:
+  author: Fernando Alves
+  description: Baseline playbook to update and install all the packages needed for a server
+  license: GPLv2
+  min_ansible_version: 2.2
+  github_branch: master
+  platforms:
+  - name: Ubuntu
+    versions:
+  #  - all
+    - trusty
+    - xenial
+  #  - yakkety
+    - zesty
+  - name: Debian
+    versions:
+  #  - all
+    - jessie
+  #  - stretch
+    - wheezy
+  - name: EL
+    versions:
+    - 6
+    - 7
+  galaxy_tags:
+    - baseline
+    - linux
+    - preparation
+
+dependencies: []
